@@ -26,7 +26,6 @@
     "Gruntfile.js",
     "demo",
     "package.json",
-    "src/js",
     "README.md",
     "CHANGES.md"
   ]
