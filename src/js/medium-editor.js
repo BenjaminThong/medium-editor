@@ -107,6 +107,8 @@ if (typeof module === 'object') {
             disableReturn: false,
             disableDoubleReturn: false,
             disableToolbar: false,
+            disableEditing: false,
+            elementsContainer: false,
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
@@ -144,7 +146,9 @@ if (typeof module === 'object') {
             var i,
                 addToolbar = false;
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].setAttribute('contentEditable', true);
+                if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
+                    this.elements[i].setAttribute('contentEditable', true);
+                }
                 if (!this.elements[i].getAttribute('data-placeholder')) {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
@@ -156,6 +160,9 @@ if (typeof module === 'object') {
             }
             // Init toolbar
             if (addToolbar) {
+                if (!this.options.elementsContainer) {
+                    this.options.elementsContainer = document.body;
+                }
                 this.initToolbar()
                     .bindButtons()
                     .bindAnchorForm()
@@ -381,7 +388,7 @@ if (typeof module === 'object') {
             toolbar.className = 'medium-editor-toolbar';
             toolbar.appendChild(this.toolbarButtons());
             toolbar.appendChild(this.toolbarFormAnchor());
-            document.body.appendChild(toolbar);
+            this.options.elementsContainer.appendChild(toolbar);
             return toolbar;
         },
 
@@ -880,7 +887,7 @@ if (typeof module === 'object') {
             anchorPreview.id = 'medium-editor-anchor-preview-' + this.id;
             anchorPreview.className = 'medium-editor-anchor-preview';
             anchorPreview.innerHTML = this.anchorPreviewTemplate();
-            document.body.appendChild(anchorPreview);
+            this.options.elementsContainer.appendChild(anchorPreview);
 
             anchorPreview.addEventListener('click', function () {
                 self.anchorPreviewClickHandler();
@@ -1031,8 +1038,8 @@ if (typeof module === 'object') {
             this.isActive = false;
 
             if (this.toolbar !== undefined) {
-                document.body.removeChild(this.anchorPreview);
-                document.body.removeChild(this.toolbar);
+                this.options.elementsContainer.removeChild(this.anchorPreview);
+                this.options.elementsContainer.removeChild(this.toolbar);
                 delete this.toolbar;
                 delete this.anchorPreview;
             }
@@ -1075,7 +1082,7 @@ if (typeof module === 'object') {
                     if (self.options.cleanPastedHTML && e.clipboardData.getData('text/html')) {
                         return self.cleanPaste(e.clipboardData.getData('text/html'));
                     }
-                    if (!(self.options.disableReturn || e.target.getAttribute('data-disable-return'))) {
+                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
                         paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
                         for (p = 0; p < paragraphs.length; p += 1) {
                             if (paragraphs[p] !== '') {
