@@ -1022,7 +1022,7 @@ if (typeof module === 'object') {
         },
 
         activate: function () {
-            if (this.isActive) {
+            if (this.isActive  || this.elements.length === 0) {
                 return;
             }
 
